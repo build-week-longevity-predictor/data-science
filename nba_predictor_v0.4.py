@@ -4,7 +4,8 @@
 # import for flask app
 from flask import Flask, request, jsonify
 # import for db connection
-import psycopg2
+
+from models import Model
 # import for pkl from dump in ML_model_class
 import pickle
 
@@ -14,33 +15,33 @@ import pickle
 
 # Creating Flask APP
 APP = Flask(__name__)
-# Flask APP run if called
-if __name__ == 'main':
-    APP.run()
 
 
 # database connect info to backend group webserver
-# will need to find privacy settings or token user/id for db access
-
-dbname= 'dcbsokv63dln3d'
-user= 'gendgbrlvinqze'
-password= '201e8bc25cf5579f911dcd131df0a4b9f01822990a58708937b73814120148a9'
-host= 'ec2-50-19-222-129.compute-1.amazonaws.com'
-
-# create db connection
-conn = psycopg2.connect(database=dbname, user=user, password=password, host=host)
-
 
 ### IDEA FLOW ###
 
 # Query to show stats result of player
 
 # Then pull from model to show similar players
+@APP.route('/')
+def index():
+    welcome = '''<h1>Data Predictions for DS Build Week. Use the following endpoints:<h1> <br>
+                /similarities --> get top 3 similar players'''
+    return welcome
+
+
+@APP.route('/similarities/<string:player>/')
+def similar_players(player:str):
+    similar = Model(player)
+    top_three = similar.build_similars()
+
+    return top_three.to_json(orient='index')
 
 
 # Flask request for player name
 # Page request should look: www.website.com/player_search?player
-@app.route('/player_search', methods = ['POST'])
+@APP.route('/player_search', methods = ['GET'])
 def search_player():
     # create cursor for player search
     curs_player = conn.cursor()
@@ -74,3 +75,8 @@ def search_player():
         curs_pred.close()
     return jsonify(results=player_find), jsonify(results=predict_players)
 
+
+
+if __name__ == '__main__':
+    APP.run(debug=True)
+    
