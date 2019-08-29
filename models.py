@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.pipeline import Pipeline
 import category_encoders as ce
 from scipy.spatial.distance import cdist
+from sklearn.externals import joblib
 
 from db_helper import DbHelper
 
@@ -59,8 +60,16 @@ class Model():
         top_three = df.iloc[top_three.index]
         return top_three
 
+    def longevity(self):
+        filename = 'model_longevity.sav'
+        loaded_model = joblib.load(filename)
+        longevity = loaded_model.predict(x_player)
+        return(longevity)
+
+
 
 if __name__ == '__main__':
     model = Model('Carl Ervin')
     
     print(model.build_similars())
+    print(model.longevity())
