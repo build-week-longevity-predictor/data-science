@@ -7,7 +7,6 @@ Click==7.0
 cycler==0.10.0
 cymem==2.0.2
 eli5==0.8.2
-encodeguess==0.0.1
 ez-setup==0.9
 Flask==1.1.1
 Flask-SQLAlchemy==2.4.0
