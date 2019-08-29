@@ -34,4 +34,3 @@ class DbHelper():
         results = cur.fetchall()
         cur.close()
         return results
-

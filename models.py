@@ -9,15 +9,14 @@ from db_helper import DbHelper
 
 
 cols = ['column_a', 'player', 'all_nba', 'all_star', 'draft_yr','pk','team', 'college', 'yrs', 'games',
-'minutes_played', 'pts', 'trb', 'ast',  'fg_percentage', 'tp_percentage','ft_percentage',
-'minutes_per_game','points_per_game','trb_per_game','assits_per_game','win_share','ws_per_game','bpm',
-'vorp','executive','tenure','exec_id','exec_draft_exp','attend_college','first_year', 'second_year',
-'third_year', 'fourth_year','fifth_year']
-
+        'minutes_played', 'pts', 'trb', 'ast',  'fg_percentage', 'tp_percentage','ft_percentage',
+        'minutes_per_game','points_per_game','trb_per_game','assits_per_game','win_share','ws_per_game','bpm',
+        'vorp','executive','tenure','exec_id','exec_draft_exp','attend_college','first_year', 'second_year',
+        'third_year', 'fourth_year','fifth_year']
 
 target = 'player'
 features = ['all_nba', 'all_star', 'draft_yr', 'pk', 'team',
-       'college', 'yrs', 'games', 'minutes_played', 'pts', 'trb', 'ast',
+       'college', 'games', 'minutes_played', 'pts', 'trb', 'ast',
        'fg_percentage', 'tp_percentage', 'ft_percentage', 'minutes_per_game',
        'points_per_game', 'trb_per_game', 'assits_per_game', 'win_share',
        'ws_per_game', 'bpm', 'vorp', 'exec_id',
@@ -45,31 +44,30 @@ class Model():
 
     def build_similars(self):
         df, player_df = self.wrangle_df()
-        encode_pipeline = Pipeline(steps=[('ord',ce.OrdinalEncoder(cols=['team','college'])),
-                          ('hot',ce.OneHotEncoder(cols=['attend_college','first_year','second_year','third_year',
-                                                      'fourth_year','fifth_year']))])
+        encode_pipeline = Pipeline(steps=[('ord',ce.OrdinalEncoder(cols=['team','college','attend_college','first_year',
+                                                    'second_year','third_year','fourth_year','fifth_year']))])
 
         #encoding 
         X = encode_pipeline['ord'].fit_transform(df[features])
         x_player = encode_pipeline['ord'].transform(player_df[features])
-        X = encode_pipeline['hot'].fit_transform(X)
-        x_player = encode_pipeline['hot'].transform(x_player)
         ary = cdist(x_player.values.reshape(1,-1), X.values, metric='euclidean')
         euclid = pd.DataFrame(ary).T.sort_values(by=0)
         top_three = euclid.iloc[1:4]
         top_three = df.iloc[top_three.index]
-        return top_three
 
-    def longevity(self):
+        #longevity
         filename = 'model_longevity.sav'
         loaded_model = joblib.load(filename)
         longevity = loaded_model.predict(x_player)
-        return(longevity)
+
+        return top_three, longevity
+
 
 
 
 if __name__ == '__main__':
-    model = Model('Carl Ervin')
+    model = Model('Kobe Bryant')
     
     print(model.build_similars())
-    print(model.longevity())
+    s, l = model.build_similars()
+    print(l[0])

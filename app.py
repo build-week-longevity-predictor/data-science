@@ -4,7 +4,7 @@
 # import for flask app
 from flask import Flask, request, jsonify
 # import for db connection
-
+import json
 from models import Model
 # import for pkl from dump in ML_model_class
 import pickle
@@ -34,9 +34,13 @@ def index():
 @APP.route('/similarities/<string:player>/')
 def similar_players(player:str):
     similar = Model(player)
-    top_three = similar.build_similars()
+    top_three, longevity = similar.build_similars()
+    data = {}
+    data['longevity'] = longevity[0]
+    top_three = top_three.to_json(orient='index')
+    data['similars'] = top_three
 
-    return top_three.to_json(orient='index')
+    return data
 
 
 # Flask request for player name
