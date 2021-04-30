@@ -63,7 +63,7 @@ thinc==7.0.8
 tqdm==4.32.2
 typing==3.6.6
 uritemplate==3.0.0
-urllib3==1.25.2
+urllib3==1.25.8
 virtualenv==16.6.1
 virtualenv-clone==0.5.3
 wasabi==0.2.2
